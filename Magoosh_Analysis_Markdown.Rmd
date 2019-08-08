@@ -1,0 +1,39 @@
+---
+title: "Magoosh Analysis"
+author: "Sarai Alvarez"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Percentage Incorrect by Subject
+```{r echo = FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(scales) #percentage scales
+library(RColorBrewer)
+
+#open CSV with either correct or incorrect answers
+INCORRECT = read.csv("/Users/salvarez/Desktop/incorrect.csv", header = TRUE)
+INCORRECT$Subject[INCORRECT$Subject==""]<- "Data Interpretation"
+```
+
+```{r echo = FALSE, collapse=TRUE}
+y <- levels(INCORRECT$Date)
+
+sprintf("Analysis was completed for %s till %s", y[1], tail(y, n=1))
+```
+ 
+
+```{r echo = FALSE, message=FALSE, warning=FALSE}
+INCORRECT %>%
+  count(INCORRECT$Subject) %>%
+  mutate(perc = n /nrow(INCORRECT)) -> INCORRECT2
+names(INCORRECT2) <- c("Subject", "n", "perc")
+
+INCORRECT2 <- INCORRECT2[order(INCORRECT2$n),] 
+ggplot(data = INCORRECT2, aes(x=reorder(Subject,n), y = perc)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()
+
+```
